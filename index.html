@@ -3,260 +3,248 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Анкета для тебя ✨</title>
+  <title>Кое-что для тебя ✨</title>
+  
+  <!-- Tailwind CSS for utility styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap');
 
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
       min-height: 100vh;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-      padding: 20px;
-      overflow: hidden;
-      position: relative;
+      overflow-x: hidden;
     }
 
-    /* Эффект падающих сердечек */
-    .heart {
-      position: absolute;
-      color: rgba(255, 75, 43, 0.6);
-      font-size: 20px;
+    h1, h2, h3, .brand-font {
+      font-family: 'Comfortaa', cursive;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Falling Hearts Animation */
+    .heart-particle {
+      position: fixed;
+      top: -10%;
       user-select: none;
       pointer-events: none;
-      animation: fall linear forwards;
+      z-index: 1;
+      animation: fall linear infinite;
     }
 
     @keyframes fall {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(105vh) rotate(360deg);
+        opacity: 0;
+      }
     }
 
-    .card {
-      background: white;
-      padding: 40px 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      text-align: center;
-      max-width: 420px;
-      width: 100%;
-      position: relative;
-      z-index: 10;
+    /* Smooth step transitions */
+    .step-transition {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .emoji {
-      font-size: 50px;
-      margin-bottom: 15px;
-    }
-
-    h1 {
-      font-size: 22px;
-      color: #333;
-      margin-bottom: 15px;
-    }
-
-    .step-counter {
-      font-size: 13px;
-      color: #ff4b2b;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      border: 2px solid #eee;
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input[type="text"]:focus {
-      border-color: #ff4b2b;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      position: relative;
-      min-height: 50px;
-    }
-
-    button {
-      padding: 12px 24px;
-      font-size: 15px;
-      font-weight: bold;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: transform 0.2s, background-color 0.2s;
-    }
-
-    .btn-primary {
-      background-color: #ff4b2b;
-      color: white;
-      box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
-      width: 100%;
-    }
-
-    .btn-primary:hover {
-      background-color: #ff416c;
-      transform: scale(1.02);
-    }
-
-    .choice-group {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .choice-btn {
-      flex: 1;
-      padding: 12px;
-      border: 2px solid #eee;
-      background: #f9f9f9;
-      border-radius: 12px;
-      font-weight: 600;
-      color: #555;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .choice-btn.selected {
-      border-color: #ff4b2b;
-      background: #fff5f4;
-      color: #ff4b2b;
-    }
-
-    /* Админ панель кнопка (скрытая в углу) */
-    .admin-trigger {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.7);
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      cursor: pointer;
-      font-size: 14px;
-      z-index: 100;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    /* Модальное окно админки */
-    .admin-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .admin-content {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      max-width: 400px;
-      width: 90%;
-      text-align: left;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .admin-content h3 { margin-bottom: 15px; color: #333; }
-    .answer-item {
-      background: #f7f7f7;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-    .close-admin {
-      background: #333;
-      color: white;
-      margin-top: 15px;
-      width: 100%;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
     }
   </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-4 relative">
 
-  <!-- Кнопка админки -->
-  <button class="admin-trigger" onclick="openAdmin()" title="Админ-панель">🔒</button>
+  <div id="heartsContainer" class="fixed inset-0 pointer-events-none z-0"></div>
 
-  <div class="card">
-    <div id="quiz-container">
-      <div class="step-counter" id="stepCounter">Вопрос 1 из 5</div>
-      <div class="emoji" id="stepEmoji">✨</div>
-      <h1 id="stepTitle">Как тебя зовут?</h1>
+  <!-- Header Actions / Admin Trigger -->
+  <div class="fixed top-4 right-4 z-50">
+    <button onclick="openAdminModal()" class="glass-card p-3 rounded-full text-pink-600 hover:text-pink-800 hover:scale-110 active:scale-95 transition-all shadow-md flex items-center gap-2 text-sm font-semibold">
+      <i data-lucide="key" class="w-5 h-5"></i>
+      <span class="hidden sm:inline">Админ</span>
+    </button>
+  </div>
+
+  <main class="glass-card w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl z-10 relative overflow-hidden my-auto">
+    
+    <!-- Progress Bar -->
+    <div id="progressContainer" class="mb-6">
+      <div class="flex justify-between items-center text-xs font-bold text-pink-500 mb-2">
+        <span id="stepCounterText">Вопрос 1 из 5</span>
+        <span id="percentText">20%</span>
+      </div>
+      <div class="w-full bg-pink-100 h-2.5 rounded-full overflow-hidden">
+        <div id="progressBar" class="bg-gradient-to-r from-pink-400 to-rose-500 h-full w-1/5 transition-all duration-500 rounded-full"></div>
+      </div>
+    </div>
+
+    <!-- Questions Form Container -->
+    <div id="quizContent" class="step-transition">
+      <div class="text-center mb-6">
+        <div id="questionEmoji" class="text-6xl mb-3 inline-block animate-bounce">👋</div>
+        <h2 id="questionTitle" class="text-xl sm:text-2xl font-bold text-gray-800 leading-snug">
+          Как тебя зовут?
+        </h2>
+      </div>
+
+      <!-- Dynamic Input Region -->
+      <div id="inputArea" class="mb-6">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex gap-3">
+        <button id="nextBtn" onclick="handleNextStep()" class="w-full py-3.5 px-6 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-300/50 hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+          <span>Далее</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="completionContent" class="hidden text-center py-4">
+      <div class="text-7xl mb-4 animate-pulse">🎉💖</div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-3 brand-font">Спасибо за ответы!</h2>
+      <p class="text-gray-600 leading-relaxed mb-6">
+        Ты супер! Все ответы записаны. Напиши мне скорее в ЛС, жду твою фотку 😉✨
+      </p>
+      <div class="p-4 bg-pink-50 rounded-2xl border border-pink-100 text-pink-700 text-sm font-semibold mb-2">
+        ✨ Отличный день, чтобы сходить на кофе!
+      </div>
+    </div>
+
+  </main>
+
+  <div id="adminModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] flex flex-col">
       
-      <div id="inputContainer">
-        <input type="text" id="userInput" placeholder="Введи ответ...">
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center mb-6 pb-3 border-b border-gray-200">
+        <div class="flex items-center gap-2 text-pink-600">
+          <i data-lucide="shield-check" class="w-6 h-6"></i>
+          <h3 class="text-xl font-bold brand-font">Панель администратора</h3>
+        </div>
+        <button onclick="closeAdminModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
       </div>
 
-      <div class="buttons">
-        <button class="btn-primary" onclick="nextStep()" id="nextBtn">Далее</button>
+      <!-- Password Lock Screen -->
+      <div id="adminLockScreen" class="py-4">
+        <p class="text-gray-600 text-sm mb-4">Для доступа к полученным ответам введите пароль администратора:</p>
+        <div class="mb-4">
+          <input type="password" id="adminPassInput" placeholder="Введите пароль..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 text-center text-lg tracking-widest">
+        </div>
+        <button onclick="verifyAdminPassword()" class="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-md transition-all">
+          Войти
+        </button>
+        <p id="adminError" class="text-red-500 text-xs text-center mt-3 hidden">Неверный пароль!</p>
       </div>
+
+      <!-- Admin Content View -->
+      <div id="adminDashboard" class="hidden flex-1 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Полученные ответы:</span>
+          <button onclick="clearAllResponses()" class="text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Очистить всё
+          </button>
+        </div>
+
+        <div id="answersList" class="flex-1 overflow-y-auto space-y-4 pr-1">
+          <!-- Injected dynamically from Firestore -->
+          <div class="text-center py-8 text-gray-400 text-sm">
+            Загрузка ответов...
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- Модальное окно админки -->
-  <div class="admin-modal" id="adminModal">
-    <div class="admin-content">
-      <h3>Панель администратора</h3>
-      <div id="adminBody">
-        <p>Введите пароль:</p>
-        <input type="text" id="adminPassword" placeholder="Пароль..." style="margin-top: 10px;">
-        <button class="btn-primary" onclick="checkPassword()">Войти</button>
-      </div>
-      <button class="button close-admin" onclick="closeAdmin()" style="padding: 10px; border: none; border-radius: 10px; cursor: pointer;">Закрыть</button>
-    </div>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  <script>
-    // Массив вопросов
-    const steps = [
+    // Firebase Global Config Fallbacks
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'romantic-quiz-app';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "AIzaSyDemoDummyKeyForAppOnly12345",
+          authDomain: "demo-app.firebaseapp.com",
+          projectId: "demo-app",
+          storageBucket: "demo-app.appspot.com",
+          messagingSenderId: "1234567890",
+          appId: "1:1234567890:web:demo"
+        };
+
+    // Initialize Firebase Services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+
+    // RULE 3: Auth Before Queries
+    async function initAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          const cred = await signInWithCustomToken(auth, __initial_auth_token);
+          currentUser = cred.user;
+        } else {
+          const cred = await signInAnonymously(auth);
+          currentUser = cred.user;
+        }
+      } catch (err) {
+        console.error("Auth Error:", err);
+      }
+    }
+    initAuth();
+
+    const questions = [
       {
+        id: "q1",
         emoji: "👋",
         title: "Как тебя зовут?",
         type: "text",
-        placeholder: "Твое имя..."
+        placeholder: "Твое прекрасное имя..."
       },
       {
+        id: "q2",
         emoji: "☕",
         title: "Сходим как-нибудь попить кофе или погулять?",
-        type: "choices",
+        type: "choice",
         options: ["С удовольствием! 😊", "Подумаю 🤔"]
       },
       {
+        id: "q3",
         emoji: "📸",
         title: "Отправишь свою фотку? Я тоже отправлю свою в ответ!",
-        type: "choices",
+        type: "choice",
         options: ["Обязательно отправлю! 😉", "Посмотрим на твою первее 😌"]
       },
       {
+        id: "q4",
         emoji: "🎵",
-        тата: "Какая музыка тебе нравится больше всего?",
         title: "Какая музыка тебе нравится больше всего?",
         type: "text",
-        placeholder: "Твой любимый жанр или трек..."
+        placeholder: "Любимый исполнитель или жанр..."
       },
       {
+        id: "q5",
         emoji: "❤️",
         title: "Опиши меня тремя смайликами в ответ:",
         type: "text",
@@ -265,121 +253,231 @@
     ];
 
     let currentStep = 0;
-    let userAnswers = {};
+    const userAnswers = {};
+    let selectedChoice = "";
 
-    function renderStep() {
-      if (currentStep >= steps.length) {
-        document.getElementById('quiz-container').innerHTML = `
-          <div class="emoji">🎉</div>
-          <h1>Спасибо за ответы!</h1>
-          <p style="color: #666; margin-top: 10px;">Ты супер! Напиши мне в ЛС, жду твою фотку 😉</p>
+    window.renderStep = function() {
+      const q = questions[currentStep];
+      const total = questions.length;
+
+      // Update progress
+      const percent = Math.round(((currentStep + 1) / total) * 100);
+      document.getElementById('stepCounterText').innerText = `Вопрос ${currentStep + 1} из ${total}`;
+      document.getElementById('percentText').innerText = `${percent}%`;
+      document.getElementById('progressBar').style.width = `${percent}%`;
+
+      // Update Question Content
+      document.getElementById('questionEmoji').innerText = q.emoji;
+      document.getElementById('questionTitle').innerText = q.title;
+
+      const inputArea = document.getElementById('inputArea');
+      selectedChoice = "";
+
+      if (q.type === 'text') {
+        inputArea.innerHTML = `
+          <input type="text" id="textAnswer" placeholder="${q.placeholder}" 
+            class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none text-gray-700 bg-white/70 font-medium transition-all"
+            onkeypress="if(event.key==='Enter') handleNextStep()">
         `;
-        return;
-      }
-
-      const s = steps[currentStep];
-      document.getElementById('stepCounter').innerText = `Вопрос ${currentStep + 1} из ${steps.length}`;
-      document.getElementById('stepEmoji').innerText = s.emoji;
-      document.getElementById('stepTitle').innerText = s.title;
-
-      const inputContainer = document.getElementById('inputContainer');
-      
-      if (s.type === 'text') {
-        inputContainer.innerHTML = `<input type="text" id="userInput" placeholder="${s.placeholder}">`;
-      } else if (s.type === 'choices') {
-        let html = '<div class="choice-group">';
-        s.options.forEach((opt, idx) => {
-          html += `<button class="choice-btn" onclick="selectChoice(this, '${opt}')">${opt}</button>`;
+        setTimeout(() => document.getElementById('textAnswer')?.focus(), 100);
+      } else if (q.type === 'choice') {
+        let buttonsHtml = '<div class="space-y-3">';
+        q.options.forEach((opt) => {
+          buttonsHtml += `
+            <button onclick="selectOption(this, '${opt}')" 
+              class="choice-btn w-full p-4 rounded-2xl border-2 border-pink-100 bg-white/60 hover:bg-pink-50/80 text-gray-700 font-semibold text-left transition-all flex items-center justify-between group">
+              <span>${opt}</span>
+              <div class="w-5 h-5 rounded-full border-2 border-pink-300 group-hover:border-pink-500 flex items-center justify-center">
+                <div class="circle-dot w-2.5 h-2.5 rounded-full bg-pink-500 opacity-0 transition-opacity"></div>
+              </div>
+            </button>
+          `;
         });
-        html += '</div>';
-        inputContainer.innerHTML = html;
+        buttonsHtml += '</div>';
+        inputArea.innerHTML = buttonsHtml;
       }
-    }
+    };
 
-    let selectedChoiceValue = "";
-    function selectChoice(btn, val) {
-      document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedChoiceValue = val;
-    }
+    window.selectOption = function(btn, value) {
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        b.classList.remove('border-pink-500', 'bg-pink-50');
+        b.querySelector('.circle-dot').classList.add('opacity-0');
+      });
+      btn.classList.add('border-pink-500', 'bg-pink-50');
+      btn.querySelector('.circle-dot').classList.remove('opacity-0');
+      selectedChoice = value;
+    };
 
-    function nextStep() {
-      const s = steps[currentStep];
+    window.handleNextStep = async function() {
+      const q = questions[currentStep];
       let val = "";
 
-      if (s.type === 'text') {
-        const inp = document.getElementById('userInput');
-        val = inp.value.trim();
+      if (q.type === 'text') {
+        const inp = document.getElementById('textAnswer');
+        val = inp ? inp.value.trim() : "";
         if (!val) {
-          inp.style.borderColor = '#ff4b2b';
+          inp.classList.add('border-red-400', 'animate-shake');
+          setTimeout(() => inp.classList.remove('animate-shake'), 500);
           return;
         }
-      } else if (s.type === 'choices') {
-        if (!selectedChoiceValue) {
-          alert('Пожалуйста, выберите вариант ответа!');
+      } else if (q.type === 'choice') {
+        if (!selectedChoice) {
+          alert("Пожалуйста, выберите один из вариантов!");
           return;
         }
-        val = selectedChoiceValue;
-        selectedChoiceValue = "";
+        val = selectedChoice;
       }
 
-      // Сохраняем ответ
-      userAnswers[`Вопрос ${currentStep + 1}: ${s.title}`] = val;
-      // Сохраняем в localStorage, чтобы админка могла их показать на этом же устройстве
-      localStorage.setItem('quiz_answers', JSON.stringify(userAnswers));
+      userAnswers[q.title] = val;
 
-      currentStep++;
-      renderStep();
-    }
-
-    // Логика админ-панели
-    function openAdmin() {
-      document.getElementById('adminModal').style.display = 'flex';
-    }
-
-    function closeAdmin() {
-      document.getElementById('adminModal').style.display = 'none';
-      // Сброс формы входа в админку
-      document.getElementById('adminBody').innerHTML = `
-        <p>Введите пароль:</p>
-        <input type="text" id="adminPassword" placeholder="Пароль..." style="margin-top: 10px;">
-        <button class="btn-primary" onclick="checkPassword()">Войти</button>
-      `;
-    }
-
-    function checkPassword() {
-      const pass = document.getElementById('adminPassword').value;
-      if (pass === '201222') {
-        const saved = JSON.parse(localStorage.getItem('quiz_answers') || '{}');
-        let html = '<h3>Ответы девушки:</h3>';
-        if (Object.keys(saved).length === 0) {
-          html += '<p style="color:#666;">Пока никто ничего не ответил.</p>';
-        } else {
-          for (let q in saved) {
-            html += `<div class="answer-item"><b>${q}</b><br>➡️ ${saved[q]}</div>`;
-          }
-        }
-        document.getElementById('adminBody').innerHTML = html;
+      if (currentStep < questions.length - 1) {
+        currentStep++;
+        renderStep();
       } else {
-        alert('Неверный пароль!');
+        await saveAnswersToFirestore();
+      }
+    };
+
+    // Save Responses to Firestore (RULE 1 Path Compliance)
+    async function saveAnswersToFirestore() {
+      document.getElementById('quizContent').classList.add('hidden');
+      document.getElementById('progressContainer').classList.add('hidden');
+      document.getElementById('completionContent').classList.remove('hidden');
+
+      try {
+        if (!currentUser) await initAuth();
+        
+        const responsesCol = collection(db, 'artifacts', appId, 'public', 'data', 'responses');
+        await addDoc(responsesCol, {
+          answers: userAnswers,
+          timestamp: new Date().toISOString(),
+          createdAt: Date.now()
+        });
+      } catch (e) {
+        console.error("Error saving responses: ", e);
       }
     }
 
-    // Генерация падающих сердечек для фона
-    function createHeart() {
-      const heart = document.createElement('div');
-      heart.classList.add('heart');
-      heart.innerHTML = '❤️';
-      heart.style.left = Math.random() * window.innerWidth + 'px';
-      heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
-      heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
-      document.body.appendChild(heart);
+    window.openAdminModal = function() {
+      document.getElementById('adminModal').classList.remove('hidden');
+    };
 
-      setTimeout(() => {
-        heart.remove();
-      }, 5000);
+    window.closeAdminModal = function() {
+      document.getElementById('adminModal').classList.add('hidden');
+    };
+
+    window.verifyAdminPassword = function() {
+      const pass = document.getElementById('adminPassInput').value;
+      if (pass === '201222') {
+        document.getElementById('adminLockScreen').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        document.getElementById('adminError').classList.add('hidden');
+        listenToResponses();
+      } else {
+        document.getElementById('adminError').classList.remove('hidden');
+      }
+    };
+
+    // Live Listen to Responses (RULE 1 & RULE 2 Compliant)
+    function listenToResponses() {
+      if (!currentUser) return;
+
+      const responsesCol = collection(db, 'artifacts', appId, 'public', 'data', 'responses');
+      
+      // Simple collection query without complex filters/ordering
+      onSnapshot(responsesCol, (snapshot) => {
+        const listContainer = document.getElementById('answersList');
+        if (snapshot.empty) {
+          listContainer.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">Ответов пока нет...</div>';
+          return;
+        }
+
+        let docs = [];
+        snapshot.forEach(doc => {
+          docs.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Client-side sorting
+        docs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        let html = '';
+        docs.forEach(item => {
+          const dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString('ru-RU') : 'Недавно';
+          html += `
+            <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm relative">
+              <div class="flex justify-between items-center mb-2 text-xs font-bold text-pink-500 border-b pb-1">
+                <span>🕒 ${dateStr}</span>
+                <button onclick="deleteResponse('${item.id}')" class="text-gray-400 hover:text-red-500">
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <div class="space-y-2 text-sm text-gray-700">
+          `;
+
+          for (let question in item.answers) {
+            html += `
+              <div>
+                <span class="text-xs text-gray-400 block">${question}</span>
+                <span class="font-semibold text-gray-800">${item.answers[question]}</span>
+              </div>
+            `;
+          }
+
+          html += `
+              </div>
+            </div>
+          `;
+        });
+
+        listContainer.innerHTML = html;
+        lucide.createIcons();
+      }, (err) => {
+        console.error("Firestore listen error:", err);
+      });
     }
-    setInterval(createHeart, 400);
+
+    window.deleteResponse = async function(id) {
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'responses', id);
+        await deleteDoc(docRef);
+      } catch (e) {
+        console.error("Error deleting doc:", e);
+      }
+    };
+
+    window.clearAllResponses = async function() {
+      if (!confirm("Вы уверены, что хотите удалить все ответы?")) return;
+      try {
+        const responsesCol = collection(db, 'artifacts', appId, 'public', 'data', 'responses');
+        const snapshot = await getDocs(responsesCol);
+        snapshot.forEach(async (document) => {
+          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'responses', document.id));
+        });
+      } catch (e) {
+        console.error("Error clearing responses:", e);
+      }
+    };
+
+    function createFallingHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart-particle');
+      heart.innerHTML = ['❤️', '💖', '✨', '🌸', '💕'][Math.floor(Math.random() * 5)];
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+      heart.style.fontSize = (Math.random() * 14 + 12) + 'px';
+      heart.style.opacity = Math.random() * 0.7 + 0.3;
+      
+      document.getElementById('heartsContainer').appendChild(heart);
+
+      setTimeout(() => heart.remove(), 6000);
+    }
+
+    // Initialize Page
+    window.onload = function() {
+      renderStep();
+      setInterval(createFallingHeart, 450);
+      lucide.createIcons();
+    };
   </script>
 </body>
 </html>
