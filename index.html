@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Анкета для тебя ✨</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Эффект падающих сердечек */
+    .heart {
+      position: absolute;
+      color: rgba(255, 75, 43, 0.6);
+      font-size: 20px;
+      user-select: none;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    .card {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .emoji {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-size: 22px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .step-counter {
+      font-size: 13px;
+      color: #ff4b2b;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border: 2px solid #eee;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #ff4b2b;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      position: relative;
+      min-height: 50px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .btn-primary {
+      background-color: #ff4b2b;
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background-color: #ff416c;
+      transform: scale(1.02);
+    }
+
+    .choice-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .choice-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #eee;
+      background: #f9f9f9;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .choice-btn.selected {
+      border-color: #ff4b2b;
+      background: #fff5f4;
+      color: #ff4b2b;
+    }
+
+    /* Админ панель кнопка (скрытая в углу) */
+    .admin-trigger {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Модальное окно админки */
+    .admin-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .admin-content {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 90%;
+      text-align: left;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .admin-content h3 { margin-bottom: 15px; color: #333; }
+    .answer-item {
+      background: #f7f7f7;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .close-admin {
+      background: #333;
+      color: white;
+      margin-top: 15px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Кнопка админки -->
+  <button class="admin-trigger" onclick="openAdmin()" title="Админ-панель">🔒</button>
+
+  <div class="card">
+    <div id="quiz-container">
+      <div class="step-counter" id="stepCounter">Вопрос 1 из 5</div>
+      <div class="emoji" id="stepEmoji">✨</div>
+      <h1 id="stepTitle">Как тебя зовут?</h1>
+      
+      <div id="inputContainer">
+        <input type="text" id="userInput" placeholder="Введи ответ...">
+      </div>
+
+      <div class="buttons">
+        <button class="btn-primary" onclick="nextStep()" id="nextBtn">Далее</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно админки -->
+  <div class="admin-modal" id="adminModal">
+    <div class="admin-content">
+      <h3>Панель администратора</h3>
+      <div id="adminBody">
+        <p>Введите пароль:</p>
+        <input type="text" id="adminPassword" placeholder="Пароль..." style="margin-top: 10px;">
+        <button class="btn-primary" onclick="checkPassword()">Войти</button>
+      </div>
+      <button class="button close-admin" onclick="closeAdmin()" style="padding: 10px; border: none; border-radius: 10px; cursor: pointer;">Закрыть</button>
+    </div>
+  </div>
+
+  <script>
+    // Массив вопросов
+    const steps = [
+      {
+        emoji: "👋",
+        title: "Как тебя зовут?",
+        type: "text",
+        placeholder: "Твое имя..."
+      },
+      {
+        emoji: "☕",
+        title: "Сходим как-нибудь попить кофе или погулять?",
+        type: "choices",
+        options: ["С удовольствием! 😊", "Подумаю 🤔"]
+      },
+      {
+        emoji: "📸",
+        title: "Отправишь свою фотку? Я тоже отправлю свою в ответ!",
+        type: "choices",
+        options: ["Обязательно отправлю! 😉", "Посмотрим на твою первее 😌"]
+      },
+      {
+        emoji: "🎵",
+        тата: "Какая музыка тебе нравится больше всего?",
+        title: "Какая музыка тебе нравится больше всего?",
+        type: "text",
+        placeholder: "Твой любимый жанр или трек..."
+      },
+      {
+        emoji: "❤️",
+        title: "Опиши меня тремя смайликами в ответ:",
+        type: "text",
+        placeholder: "Например: 😎🔥🚀"
+      }
+    ];
+
+    let currentStep = 0;
+    let userAnswers = {};
+
+    function renderStep() {
+      if (currentStep >= steps.length) {
+        document.getElementById('quiz-container').innerHTML = `
+          <div class="emoji">🎉</div>
+          <h1>Спасибо за ответы!</h1>
+          <p style="color: #666; margin-top: 10px;">Ты супер! Напиши мне в ЛС, жду твою фотку 😉</p>
+        `;
+        return;
+      }
+
+      const s = steps[currentStep];
+      document.getElementById('stepCounter').innerText = `Вопрос ${currentStep + 1} из ${steps.length}`;
+      document.getElementById('stepEmoji').innerText = s.emoji;
+      document.getElementById('stepTitle').innerText = s.title;
+
+      const inputContainer = document.getElementById('inputContainer');
+      
+      if (s.type === 'text') {
+        inputContainer.innerHTML = `<input type="text" id="userInput" placeholder="${s.placeholder}">`;
+      } else if (s.type === 'choices') {
+        let html = '<div class="choice-group">';
+        s.options.forEach((opt, idx) => {
+          html += `<button class="choice-btn" onclick="selectChoice(this, '${opt}')">${opt}</button>`;
+        });
+        html += '</div>';
+        inputContainer.innerHTML = html;
+      }
+    }
+
+    let selectedChoiceValue = "";
+    function selectChoice(btn, val) {
+      document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedChoiceValue = val;
+    }
+
+    function nextStep() {
+      const s = steps[currentStep];
+      let val = "";
+
+      if (s.type === 'text') {
+        const inp = document.getElementById('userInput');
+        val = inp.value.trim();
+        if (!val) {
+          inp.style.borderColor = '#ff4b2b';
+          return;
+        }
+      } else if (s.type === 'choices') {
+        if (!selectedChoiceValue) {
+          alert('Пожалуйста, выберите вариант ответа!');
+          return;
+        }
+        val = selectedChoiceValue;
+        selectedChoiceValue = "";
+      }
+
+      // Сохраняем ответ
+      userAnswers[`Вопрос ${currentStep + 1}: ${s.title}`] = val;
+      // Сохраняем в localStorage, чтобы админка могла их показать на этом же устройстве
+      localStorage.setItem('quiz_answers', JSON.stringify(userAnswers));
+
+      currentStep++;
+      renderStep();
+    }
+
+    // Логика админ-панели
+    function openAdmin() {
+      document.getElementById('adminModal').style.display = 'flex';
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminModal').style.display = 'none';
+      // Сброс формы входа в админку
+      document.getElementById('adminBody').innerHTML = `
+        <p>Введите пароль:</p>
+        <input type="text" id="adminPassword" placeholder="Пароль..." style="margin-top: 10px;">
+        <button class="btn-primary" onclick="checkPassword()">Войти</button>
+      `;
+    }
+
+    function checkPassword() {
+      const pass = document.getElementById('adminPassword').value;
+      if (pass === '201222') {
+        const saved = JSON.parse(localStorage.getItem('quiz_answers') || '{}');
+        let html = '<h3>Ответы девушки:</h3>';
+        if (Object.keys(saved).length === 0) {
+          html += '<p style="color:#666;">Пока никто ничего не ответил.</p>';
+        } else {
+          for (let q in saved) {
+            html += `<div class="answer-item"><b>${q}</b><br>➡️ ${saved[q]}</div>`;
+          }
+        }
+        document.getElementById('adminBody').innerHTML = html;
+      } else {
+        alert('Неверный пароль!');
+      }
+    }
+
+    // Генерация падающих сердечек для фона
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.innerHTML = '❤️';
+      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+      document.body.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 5000);
+    }
+    setInterval(createHeart, 400);
+  </script>
+</body>
+</html>
